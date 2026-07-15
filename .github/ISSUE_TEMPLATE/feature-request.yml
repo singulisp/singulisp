@@ -1,0 +1,56 @@
+name: Feature request
+description: Propose a use case or capability needed in Singulisp
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You do not need to provide a finished specification or implementation. Tell us what you want to accomplish and what currently stands in your way.
+
+        We prioritize capabilities that cannot be expressed in Singulisp in principle, or cannot be expressed while preserving the required performance characteristics. Requests that would degrade existing fast paths may not be accepted.
+
+        Do not use this form for security issues or issues involving information that cannot be made public.
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: What you want to accomplish
+      description: Describe the use case, the problem to solve, and when the capability is needed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: limitation
+    attributes:
+      label: Current limitation
+      description: Describe, as far as you can, what cannot currently be done in Singulisp or where you are running into difficulty.
+    validations:
+      required: true
+
+  - type: textarea
+    id: capability
+    attributes:
+      label: Capability you need
+      description: Describe any desired language feature, standard-library facility, or tool behavior. This does not need to be a finished design.
+
+  - type: textarea
+    id: performance
+    attributes:
+      label: Performance requirements
+      description: Describe any execution speed, memory use, latency, cost predictability, or other performance characteristics that must be preserved.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Current alternatives
+      description: Describe any approaches, workarounds, or alternatives you tried and where they fell short.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing GitHub Issues and found no duplicate request.
+          required: true
+        - label: If I attached code or data, I have the right to provide it and permit the project to use and modify it under the Apache License 2.0.
+          required: true

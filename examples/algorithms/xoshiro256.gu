@@ -1,0 +1,44 @@
+; Adapted from the Singulisp benchmark suite for use as a standalone example.
+
+(use std::num [u64/wrap-add])
+
+(const SAMPLE_COUNT : i64 1000000)
+(const MASK20 : u64 (to-u64 1048575))
+(const SEED0 : u64 (to-u64 123456789123456789))
+(const SEED1 : u64 (to-u64 362436362436362436))
+(const SEED2 : u64 (to-u64 521288629521288629))
+(const SEED3 : u64 (to-u64 886751238867512388))
+
+(defn rotl64 [(x : u64) (k : u64)] -> u64
+  (bit-or (bit-shl x k) (bit-shr x (- (to-u64 64) k))))
+
+(defn reduce-output [(x : u64)] -> i64
+  (let lo (to-i64 (bit-and x MASK20)))
+  (let hi (to-i64 (bit-and (bit-shr x (to-u64 32)) MASK20)))
+  (+ lo (* hi 3)))
+
+(defn stream-checksum [(n : i64)] -> i64
+  (let mut s0 : u64 SEED0)
+  (let mut s1 : u64 SEED1)
+  (let mut s2 : u64 SEED2)
+  (let mut s3 : u64 SEED3)
+  (let mut checksum : i64 0)
+  (let mut i : i64 0)
+
+  (while (< i n)
+    (let result (wrap-add (rotl64 (wrap-add s0 s3) (to-u64 23)) s0))
+    (let t (bit-shl s1 (to-u64 17)))
+    (set! s2 (bit-xor s2 s0))
+    (set! s3 (bit-xor s3 s1))
+    (set! s1 (bit-xor s1 s2))
+    (set! s0 (bit-xor s0 s3))
+    (set! s2 (bit-xor s2 t))
+    (set! s3 (rotl64 s3 (to-u64 45)))
+    (set! checksum (+ checksum (reduce-output result)))
+    (set! i (+ i 1)))
+
+  checksum)
+
+#[external]
+(defn main [] -> ()
+  (println! "checksum={}" (stream-checksum SAMPLE_COUNT)))

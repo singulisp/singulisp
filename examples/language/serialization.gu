@@ -1,0 +1,28 @@
+; Adapted from the Singulisp benchmark suite for use as a standalone example.
+
+(defstruct Sample
+  (id : i32)
+  (count : i32)
+  (position : Vec3))
+
+(defn schema-aware-roundtrip [(value : [& Sample])] -> i32
+  (let bytes (Sample/serialize value))
+  (match (Sample/try-deserialize (& bytes))
+    [(Ok decoded) decoded.id]
+    [(Err error) -1]))
+
+(defn raw-roundtrip [(value : [& Sample])] -> i32
+  (let mut bytes : [Vec u8] (Vec/new))
+  (Sample/bbin-write value (& mut bytes))
+  (let mut position 0)
+  (match (Sample/bbin-read (& bytes) (& mut position))
+    [(Ok decoded) decoded.id]
+    [(Err error) -1]))
+
+#[external]
+(defn main [] -> ()
+  (let value (Sample 42 3 (Vec3 1.0f 2.0f 3.0f)))
+  (println! "schema-aware={} raw={} schema-id={}"
+    (schema-aware-roundtrip (& value))
+    (raw-roundtrip (& value))
+    (Sample/schema-id)))

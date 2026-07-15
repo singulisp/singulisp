@@ -1,0 +1,44 @@
+; Adapted from the Singulisp benchmark suite for use as a standalone example.
+
+(use std::strings
+  [StringBuilder
+   StringBuilder/with-capacity
+   StringBuilder/append
+   StringBuilder/finish
+   split
+   parse-i64])
+
+(const ITEM_COUNT : i64 128)
+
+(defn value-at [(i : i64)] -> i64
+  (% (+ (* i 97) 13) 100000))
+
+(defn build-csv [(count : i64)] -> String
+  (let mut output (StringBuilder/with-capacity (to-i32 (* count 6))))
+  (let mut i : i64 0)
+  (while (< i count)
+    (when (> i 0)
+      (let comma ",")
+      (StringBuilder/append (& mut output) (& comma)))
+    (let value (format "{:05}" (value-at i)))
+    (StringBuilder/append (& mut output) (& value))
+    (set! i (+ i 1)))
+  (StringBuilder/finish (& mut output)))
+
+(defn sum-csv [(text : String)] -> i64
+  (let parts (split text ","))
+  (let mut sum : i64 0)
+  (let mut i : i32 0)
+  (let count (Vec/len (& parts)))
+
+  (while (< i count)
+    (match (parse-i64 (String/from (& (Vec/get (& parts) i))))
+      [(Some value) (set! sum (+ sum value))]
+      [None ()])
+    (set! i (+ i 1)))
+
+  sum)
+
+#[external]
+(defn main [] -> ()
+  (println! "sum={}" (sum-csv (build-csv ITEM_COUNT))))

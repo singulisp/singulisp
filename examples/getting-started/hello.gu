@@ -1,0 +1,1 @@
+#[external] (defn main [] -> () (println! "Hello, Singulisp!"))

@@ -1,0 +1,75 @@
+; Adapted from the Singulisp benchmark suite for use as a standalone example.
+
+(const ITEM_COUNT : i64 4096)
+(const HASH_A : i64 1103515245)
+(const HASH_B : i64 12345)
+
+(defn generated-value [(i : i64)] -> i32
+  (to-i32 (bit-and (+ (* i HASH_A) HASH_B) 2147483647)))
+
+(defn fill-data [(data : [& mut [Vec i32]]) (n : i64)] -> ()
+  (let mut i : i64 0)
+  (while (< i n)
+    (Vec/push data (generated-value i))
+    (set! i (+ i 1))))
+
+(defn swap [(data : [& mut [Vec i32]]) (i : i64) (j : i64)] -> ()
+  (let a (Vec/get (& (* data)) i))
+  (let b (Vec/get (& (* data)) j))
+  (Vec/set data i b)
+  (Vec/set data j a))
+
+(defn sift-down [(data : [& mut [Vec i32]]) (start : i64) (end : i64)] -> ()
+  (let mut root start)
+  (let root-value (Vec/get (& (* data)) root))
+  (let mut done false)
+
+  (while (and (not done) (<= (+ (* root 2) 1) end))
+    (let child (+ (* root 2) 1))
+    (let mut swap-index child)
+    (let mut swap-value (Vec/get (& (* data)) child))
+
+    (when (and (<= (+ child 1) end)
+               (< swap-value (Vec/get (& (* data)) (+ child 1))))
+      (set! swap-index (+ child 1))
+      (set! swap-value (Vec/get (& (* data)) swap-index)))
+
+    (if (<= swap-value root-value)
+      (set! done true)
+      (do
+        (Vec/set data root swap-value)
+        (set! root swap-index))))
+
+  (Vec/set data root root-value))
+
+(defn heap-sort [(data : [& mut [Vec i32]]) (n : i64)] -> ()
+  (let mut start (/ n 2))
+  (while (> start 0)
+    (set! start (- start 1))
+    (sift-down data start (- n 1)))
+
+  (let mut end (- n 1))
+  (while (> end 0)
+    (swap data 0 end)
+    (set! end (- end 1))
+    (sift-down data 0 end)))
+
+(defn sorted? [(data : [& [Vec i32]]) (n : i64)] -> bool
+  (let mut i : i64 1)
+  (let mut ordered true)
+  (while (< i n)
+    (when (> (Vec/get data (- i 1)) (Vec/get data i))
+      (set! ordered false))
+    (set! i (+ i 1)))
+  ordered)
+
+#[external]
+(defn main [] -> ()
+  (let mut data : [Vec i32] (Vec/new))
+  (Vec/reserve (& mut data) ITEM_COUNT)
+  (fill-data (& mut data) ITEM_COUNT)
+  (heap-sort (& mut data) ITEM_COUNT)
+  (println! "sorted={} first={} last={}"
+    (sorted? (& data) ITEM_COUNT)
+    (Vec/get (& data) 0)
+    (Vec/get (& data) (- ITEM_COUNT 1))))

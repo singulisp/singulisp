@@ -1,0 +1,24 @@
+(defstruct Point
+  (x : f32)
+  (y : f32)
+  (z : f32))
+
+#[no-alloc]
+#[fp-mode :fast]
+(defn nearest_distance_sq
+  [(points : [& [SoaVec Point]])
+   (query : Vec3)] -> f32
+  (let qx query.x)
+  (let qy query.y)
+  (let qz query.z)
+  (let count (SoaVec/len points))
+
+  #[spmd :width 8 :require]
+  (spmd [i count]
+    (let dx (- (SoaVec/get-field points i x) qx))
+    (let dy (- (SoaVec/get-field points i y) qy))
+    (let dz (- (SoaVec/get-field points i z) qz))
+
+    (spmd/reduce min (f32/INF)
+      (+ (+ (* dx dx) (* dy dy))
+         (* dz dz)))))

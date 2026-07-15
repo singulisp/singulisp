@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible bug or documentation error
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the report. Please provide the minimum information needed to investigate.
+
+        Do not use this form for security issues or issues involving information that cannot be made public.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Briefly describe the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce or affected location
+      description: Provide the minimal source, input, commands, and compiler options needed to reproduce the issue. For documentation errors, identify the page and relevant passage.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: Provide the actual output, diagnostics, exit status, or other observed result.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Affected version
+      description: Provide the Singulisp version you used or the version of the documentation you reviewed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide the OS, CPU architecture, target, build mode, and other details relevant to reproduction. If this is not applicable, say so.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Include any suspected cause, workaround, or relevant measurements.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing GitHub Issues and found no report of the same bug.
+          required: true
+        - label: This report contains no confidential information or data that cannot be made public.
+          required: true
+        - label: If I attached code or data, I have the right to provide it and permit the project to use and modify it under the Apache License 2.0.
+          required: true
