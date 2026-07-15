@@ -1,0 +1,6 @@
+#[external] (defn main [] -> ()
+  (let a (f32x4 1.0f 2.0f 3.0f 4.0f))
+  (let b (simd/add a a))
+  (let direction (Vec3 1.0f 2.0f 3.0f))
+  (println! "lane0={}" (simd/extract b 0))
+  (println! "length={}" (Vec3/length direction)))

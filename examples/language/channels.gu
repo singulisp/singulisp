@@ -1,0 +1,24 @@
+; Adapted from the Singulisp benchmark suite for use as a standalone example.
+
+(const MESSAGE_COUNT : i32 100000)
+
+#[external]
+(defn main [] -> ()
+  (let channel (channel/new 1024))
+  (let mut checksum : i64 (to-i64 0))
+
+  (with-scope scope
+    (scope/spawn scope
+      (fn [] -> ()
+        (let mut value 0)
+        (while (< value MESSAGE_COUNT)
+          (channel/send channel value)
+          (set! value (+ value 1)))))
+
+    (let mut received 0)
+    (while (< received MESSAGE_COUNT)
+      (set! checksum (+ checksum (to-i64 (channel/recv channel))))
+      (set! received (+ received 1))))
+
+  (channel/close channel)
+  (println! "checksum={}" checksum))

@@ -1,0 +1,53 @@
+; Adapted from the Singulisp benchmark suite for use as a standalone example.
+
+(const MAX_DEPTH : i32 14)
+(const MIN_DEPTH : i32 4)
+
+(defregion @tree_pool
+  :allocator (arena :bump)
+  :lifetime :scoped
+  :thread :local
+  :default-capacity (MiB 16))
+
+(deftype Tree
+  Leaf
+  (Node [& Tree] [& Tree]))
+
+(defn make-tree [(arena : [& mut @tree_pool]) (depth : i32)] -> [& Tree]
+  (if (> depth 0)
+    (do
+      (let left (make-tree arena (- depth 1)))
+      (let right (make-tree arena (- depth 1)))
+      (arena/alloc! arena (Node left right)))
+    (arena/alloc! arena Leaf)))
+
+(defn check-tree [(tree : [& Tree])] -> i32
+  (match (* tree)
+    [Leaf 1]
+    [(Node left right)
+     (+ (+ 1 (check-tree left)) (check-tree right))]))
+
+#[external]
+(defn main [] -> ()
+  (@tree_pool long_lived_pool
+    (let long-lived (make-tree (& mut long_lived_pool) MAX_DEPTH))
+    (let mut depth MIN_DEPTH)
+
+    (while (<= depth MAX_DEPTH)
+      (let iterations (bit-shl 1 (+ (- MAX_DEPTH depth) MIN_DEPTH)))
+      (let mut checksum 0)
+      (let mut i 0)
+
+      (@tree_pool scratch_pool
+        (while (< i iterations)
+          (set! checksum
+            (+ checksum (check-tree (make-tree (& mut scratch_pool) depth))))
+          (arena/reset! scratch_pool)
+          (set! i (+ i 1))))
+
+      (println! "trees={} depth={} checksum={}" iterations depth checksum)
+      (set! depth (+ depth 2)))
+
+    (println! "long-lived depth={} checksum={}"
+      MAX_DEPTH
+      (check-tree long-lived))))
