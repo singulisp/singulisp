@@ -1,4 +1,4 @@
-![logo](https://github.com/user-attachments/assets/92f67fdc-aa2c-4f32-9bf9-c84fa19e37c8)
+<p align="center"><img src="https://github.com/user-attachments/assets/92f67fdc-aa2c-4f32-9bf9-c84fa19e37c8" width="250"></p>
 
 # Singulisp
 
