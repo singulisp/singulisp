@@ -1,3 +1,5 @@
+![logo](https://github.com/user-attachments/assets/92f67fdc-aa2c-4f32-9bf9-c84fa19e37c8)
+
 # Singulisp
 
 Singulisp is a **statically typed Lisp that prioritizes execution speed and predictable costs**.
